@@ -46,15 +46,13 @@ export async function postChoice(req, res) {
 			.collection("poll")
 			.findOne({ _id: new ObjectId(req.body.pollId) });
 
-		console.log(poll);
-
 		if (!poll) {
 			return res.sendStatus(404);
 		}
 
 		console.log(dayjs().diff(poll.expireAt, "day"));
 
-		if (dayjs().diff(poll.expireAt, "day") < 1) {
+		if (dayjs().diff(poll.expireAt, "day") > 0) {
 			return res.sendStatus(403);
 		}
 
@@ -68,6 +66,20 @@ export async function postChoice(req, res) {
 		return res.status(201).send(req.body);
 	} catch (err) {
 		console.log(err);
+		return res.status(500).send(err);
+	}
+}
+
+export async function getChoices(req, res) {
+	try {
+		const { id } = req.params;
+		const poll = await db.collection("poll").findOne({ _id: new ObjectId(id) });
+
+		if (!poll) return res.sendStatus(404);
+
+		const choices = await db.collection(`${poll.title}`).find().toArray();
+		return res.send(choices);
+	} catch (err) {
 		return res.status(500).send(err);
 	}
 }
