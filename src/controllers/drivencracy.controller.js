@@ -52,7 +52,9 @@ export async function postChoice(req, res) {
 			return res.sendStatus(404);
 		}
 
-		if (dayjs().diff(poll.expireAt, "day") > 30) {
+		console.log(dayjs().diff(poll.expireAt, "day"));
+
+		if (dayjs().diff(poll.expireAt, "day") < 1) {
 			return res.sendStatus(403);
 		}
 
